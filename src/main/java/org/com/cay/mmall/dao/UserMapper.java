@@ -1,5 +1,6 @@
 package org.com.cay.mmall.dao;
 
+import org.apache.ibatis.annotations.Param;
 import org.com.cay.mmall.entity.User;
 
 public interface UserMapper {
@@ -14,4 +15,14 @@ public interface UserMapper {
     int updateByPrimaryKeySelective(User record);
 
     int updateByPrimaryKey(User record);
+
+    int checkUsername(String username);
+
+    int checkEmail(String email);
+
+    User login(@Param("username") String username, @Param("password") String password);
+
+    String selectQuestionByUsername(String username);
+
+    int checkAnswer(@Param("username") String username, @Param("question") String question, @Param("answer") String answer);
 }
