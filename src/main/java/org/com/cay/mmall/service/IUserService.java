@@ -22,4 +22,6 @@ public interface IUserService {
 	ServerResponse<User> updateUserInfo(User user);
 
 	ServerResponse<User> getUserDetail(Integer id);
+
+	ServerResponse checkAdminRole(User user);
 }

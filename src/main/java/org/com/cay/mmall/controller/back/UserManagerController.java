@@ -26,6 +26,14 @@ public class UserManagerController {
 	@Autowired
 	private IUserService userService;
 
+	/**
+	 * 后台管理员登录
+	 *
+	 * @param username
+	 * @param password
+	 * @param session
+	 * @return
+	 */
 	@PostMapping("/login.do")
 	@ApiOperation(value = "后台用户（管理员）登录", notes = "根据用户名和密码登录，并把用户信息（密码置为空）放入session中")
 	@ApiImplicitParams({
@@ -36,7 +44,7 @@ public class UserManagerController {
 		ServerResponse<User> response = userService.login(username, password);
 		if (response.isSuccess()) {
 			User user = response.getData();
-			if (user.getRole() == Constant.Role.ROLE_ADMIN) {
+			if (user.getRole().intValue() == Constant.Role.ROLE_ADMIN) {
 				//登录的是管理员
 				session.setAttribute(Constant.CURRENT_USER, user);
 				return response;

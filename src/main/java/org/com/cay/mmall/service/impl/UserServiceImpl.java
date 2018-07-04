@@ -42,12 +42,12 @@ public class UserServiceImpl implements IUserService {
 	@Override
 	public ServerResponse<String> register(User user) {
 		ServerResponse<String> response = this.checkValid(user.getUsername(), Constant.USERNAME);
-		if (!response.isSuccess()){
+		if (!response.isSuccess()) {
 			return response;
 		}
 
 		response = this.checkValid(user.getEmail(), Constant.EMAIL);
-		if (!response.isSuccess()){
+		if (!response.isSuccess()) {
 			return response;
 		}
 		user.setRole(Constant.Role.ROLE_CUSTOMER);
@@ -189,5 +189,13 @@ public class UserServiceImpl implements IUserService {
 		}
 		user.setPassword(StringUtils.EMPTY);
 		return ServerResponse.createBySuccess(user);
+	}
+
+	@Override
+	public ServerResponse checkAdminRole(User user) {
+		if (user != null && user.getRole().intValue() == Constant.Role.ROLE_ADMIN) {
+			return ServerResponse.createBySuccess();
+		}
+		return ServerResponse.createByError();
 	}
 }
