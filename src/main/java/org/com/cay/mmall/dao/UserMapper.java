@@ -4,25 +4,31 @@ import org.apache.ibatis.annotations.Param;
 import org.com.cay.mmall.entity.User;
 
 public interface UserMapper {
-    int deleteByPrimaryKey(Integer id);
+	int deleteByPrimaryKey(Integer id);
 
-    int insert(User record);
+	int insert(User record);
 
-    int insertSelective(User record);
+	int insertSelective(User record);
 
-    User selectByPrimaryKey(Integer id);
+	User selectByPrimaryKey(Integer id);
 
-    int updateByPrimaryKeySelective(User record);
+	int updateByPrimaryKeySelective(User record);
 
-    int updateByPrimaryKey(User record);
+	int updateByPrimaryKey(User record);
 
-    int checkUsername(String username);
+	int checkUsername(String username);
 
-    int checkEmail(String email);
+	int checkEmail(String email);
 
-    User login(@Param("username") String username, @Param("password") String password);
+	User login(@Param("username") String username, @Param("password") String password);
 
-    String selectQuestionByUsername(String username);
+	String selectQuestionByUsername(String username);
 
-    int checkAnswer(@Param("username") String username, @Param("question") String question, @Param("answer") String answer);
+	int checkAnswer(@Param("username") String username, @Param("question") String question, @Param("answer") String answer);
+
+	int updatePasswordByUsername(@Param("username") String username, @Param("password") String password);
+
+	int checkPassword(@Param("password") String password, @Param("userId") Integer userId);
+
+	int checkEmailByUserId(@Param("email") String email, @Param("userId") Integer userId);
 }

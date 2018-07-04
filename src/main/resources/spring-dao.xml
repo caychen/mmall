@@ -49,7 +49,7 @@
                 <bean class="com.github.pagehelper.PageInterceptor">
                     <property name="properties">
                         <value>
-                            dialect=mysql
+                            helperDialect=mysql
                         </value>
                     </property>
                 </bean>

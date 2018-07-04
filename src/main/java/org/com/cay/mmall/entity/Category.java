@@ -3,87 +3,87 @@ package org.com.cay.mmall.entity;
 import java.util.Date;
 
 public class Category {
-    private Integer id;
+	private Integer id;
 
-    private Integer parentId;
+	private Integer parentId;
 
-    private String name;
+	private String name;
 
-    private Boolean status;
+	private Boolean status;
 
-    private Integer sortOrder;
+	private Integer sortOrder;
 
-    private Date createTime;
+	private Date createTime;
 
-    private Date updateTime;
+	private Date updateTime;
 
-    public Category(Integer id, Integer parentId, String name, Boolean status, Integer sortOrder, Date createTime, Date updateTime) {
-        this.id = id;
-        this.parentId = parentId;
-        this.name = name;
-        this.status = status;
-        this.sortOrder = sortOrder;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
+	public Category(Integer id, Integer parentId, String name, Boolean status, Integer sortOrder, Date createTime, Date updateTime) {
+		this.id = id;
+		this.parentId = parentId;
+		this.name = name;
+		this.status = status;
+		this.sortOrder = sortOrder;
+		this.createTime = createTime;
+		this.updateTime = updateTime;
+	}
 
-    public Category() {
-        super();
-    }
+	public Category() {
+		super();
+	}
 
-    public Integer getId() {
-        return id;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public Integer getParentId() {
-        return parentId;
-    }
+	public Integer getParentId() {
+		return parentId;
+	}
 
-    public void setParentId(Integer parentId) {
-        this.parentId = parentId;
-    }
+	public void setParentId(Integer parentId) {
+		this.parentId = parentId;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
-    }
+	public void setName(String name) {
+		this.name = name == null ? null : name.trim();
+	}
 
-    public Boolean getStatus() {
-        return status;
-    }
+	public Boolean getStatus() {
+		return status;
+	}
 
-    public void setStatus(Boolean status) {
-        this.status = status;
-    }
+	public void setStatus(Boolean status) {
+		this.status = status;
+	}
 
-    public Integer getSortOrder() {
-        return sortOrder;
-    }
+	public Integer getSortOrder() {
+		return sortOrder;
+	}
 
-    public void setSortOrder(Integer sortOrder) {
-        this.sortOrder = sortOrder;
-    }
+	public void setSortOrder(Integer sortOrder) {
+		this.sortOrder = sortOrder;
+	}
 
-    public Date getCreateTime() {
-        return createTime;
-    }
+	public Date getCreateTime() {
+		return createTime;
+	}
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
 
-    public Date getUpdateTime() {
-        return updateTime;
-    }
+	public Date getUpdateTime() {
+		return updateTime;
+	}
 
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
 }

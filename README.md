@@ -1,0 +1,3 @@
+* 1、遗留问题：
+使用swagger2之后，在访问http://localhost:8080/swagger-ui.html之后会弹出一个框，提示‘Unable to infer base url. This is common when using dynamic servlet registration or when the API is behind an API Gateway. The base url is the root of where all the swagger resources are served. For e.g. if the api is available at http://example.org/api/v2/api-docs then the base url is http://example.org/api/. Please enter the location manually: ’，
+查遍网站都没找到解决方案。
