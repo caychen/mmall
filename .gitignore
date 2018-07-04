@@ -19,7 +19,6 @@ target/
 .idea/
 /idea/
 *.ipr
-*.iml
 *.iws
 
 # temp file
