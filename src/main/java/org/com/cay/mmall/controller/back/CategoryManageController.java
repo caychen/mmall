@@ -23,9 +23,9 @@ import javax.servlet.http.HttpSession;
 @RestController
 @RequestMapping("/manage/category")
 @Api(value = "后台管理的品类模块控制类")
-public class CategoryManagerController {
+public class CategoryManageController {
 
-	private final Logger logger = LoggerFactory.getLogger(CategoryManagerController.class);
+	private final Logger logger = LoggerFactory.getLogger(CategoryManageController.class);
 
 	@Autowired
 	private IUserService userService;

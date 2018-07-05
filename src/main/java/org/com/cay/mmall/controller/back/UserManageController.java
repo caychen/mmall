@@ -23,9 +23,9 @@ import javax.servlet.http.HttpSession;
 @RestController
 @RequestMapping("/manage/user")
 @Api("后台用户（管理员）模块控制类")
-public class UserManagerController {
+public class UserManageController {
 
-	private final Logger logger = LoggerFactory.getLogger(UserManagerController.class);
+	private final Logger logger = LoggerFactory.getLogger(UserManageController.class);
 
 	@Autowired
 	private IUserService userService;

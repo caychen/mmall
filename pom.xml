@@ -34,10 +34,10 @@
         <jackson.version>2.9.5</jackson.version>
         <joda-time.version>2.10</joda-time.version>
         <jsp-api.version>2.3.1</jsp-api.version>
-        <jsqlparser.version>0.9.7</jsqlparser.version>
+        <!--<jsqlparser.version>0.9.7</jsqlparser.version>-->
         <junit.version>4.12</junit.version>
         <logback.version>1.2.3</logback.version>
-        <mybatis-paginator.version>1.2.17</mybatis-paginator.version>
+        <!--<mybatis-paginator.version>1.2.17</mybatis-paginator.version>-->
         <mybatis-spring.version>1.3.2</mybatis-spring.version>
         <mybatis.version>3.4.6</mybatis.version>
         <mysql.version>5.1.26</mysql.version>
@@ -47,6 +47,7 @@
         <spring.version>4.3.18.RELEASE</spring.version>
         <swagger2.version>2.7.0</swagger2.version>
         <zxing.version>3.3.3</zxing.version>
+        <lombok.version>1.18.0</lombok.version>
     </properties>
 
     <dependencies>
@@ -197,18 +198,17 @@
             <artifactId>pagehelper</artifactId>
             <version>${pagehelper.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.github.miemiedev/mybatis-paginator -->
-        <dependency>
+
+        <!--<dependency>
             <groupId>com.github.miemiedev</groupId>
             <artifactId>mybatis-paginator</artifactId>
             <version>${mybatis-paginator.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.github.jsqlparser/jsqlparser -->
         <dependency>
             <groupId>com.github.jsqlparser</groupId>
             <artifactId>jsqlparser</artifactId>
             <version>${jsqlparser.version}</version>
-        </dependency>
+        </dependency>-->
 
         <!--alipay-->
         <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
@@ -263,6 +263,13 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>${swagger2.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
