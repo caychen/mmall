@@ -88,6 +88,19 @@ public class Category {
 	}
 
 	@Override
+	public String toString() {
+		return "Category{" +
+				"id=" + id +
+				", parentId=" + parentId +
+				", name='" + name + '\'' +
+				", status=" + status +
+				", sortOrder=" + sortOrder +
+				", createTime=" + createTime +
+				", updateTime=" + updateTime +
+				'}';
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;

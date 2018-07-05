@@ -9,6 +9,8 @@ import org.com.cay.mmall.common.ResponseCode;
 import org.com.cay.mmall.common.ServerResponse;
 import org.com.cay.mmall.entity.User;
 import org.com.cay.mmall.service.IUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,8 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/user")
 @Api("前台用户模块控制类")
 public class UserController {
+
+	private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 	@Autowired
 	private IUserService userService;
@@ -37,7 +41,7 @@ public class UserController {
 			@ApiImplicitParam(name = "password", value = "登录密码", required = true, dataType = "String", paramType = "query")
 	})
 	public ServerResponse<User> login(String username, String password, HttpSession session) {
-
+		logger.info("前台用户登录, username: {}, password: {}", username, password);
 		ServerResponse<User> response = userService.login(username, password);
 		if (response.isSuccess()) {
 			session.setAttribute(Constant.CURRENT_USER, response.getData());
@@ -54,6 +58,7 @@ public class UserController {
 	@GetMapping("/logout.do")
 	@ApiOperation(value = "用户登出", notes = "将登录的用户进行注销")
 	public ServerResponse<String> logout(HttpSession session) {
+		logger.info("用户登出注销");
 		session.removeAttribute(Constant.CURRENT_USER);
 		return ServerResponse.createBySuccess();
 	}
@@ -67,6 +72,7 @@ public class UserController {
 	@PostMapping("/register.do")
 	@ApiOperation(value = "用户注册", notes = "用户填写表单，进行注册")
 	public ServerResponse<String> register(User user) {
+		logger.info("用户注册， user: {}", user);
 		return userService.register(user);
 	}
 
@@ -84,6 +90,7 @@ public class UserController {
 			@ApiImplicitParam(name = "type", value = "username或email", required = true, dataType = "String", paramType = "query")
 	})
 	public ServerResponse<String> checkValid(String data, String type) {
+		logger.info("注册时检查是否合法, data: {}, type: {}", data, type);
 		return userService.checkValid(data, type);
 	}
 
@@ -96,6 +103,7 @@ public class UserController {
 	@GetMapping("/get_user_info.do")
 	@ApiOperation(value = "获取当前登录的用户信息")
 	public ServerResponse<User> getUserInfo(HttpSession session) {
+		logger.info("获取当前登录的用户信息(只限于存在session中的信息)");
 		User user = (User) session.getAttribute(Constant.CURRENT_USER);
 		if (user != null) {
 			return ServerResponse.createBySuccess(user);
@@ -113,6 +121,7 @@ public class UserController {
 	@ApiOperation(value = "获取用户对应的忘记密码的问题")
 	@ApiImplicitParam(name = "username", value = "根据username获取忘记密码的问题", required = true, dataType = "String", paramType = "query")
 	public ServerResponse<String> forgetGetQuestion(String username) {
+		logger.info("获取用户对应的忘记密码的问题, username: {}", username);
 		return userService.selectQuestion(username);
 	}
 
@@ -132,6 +141,7 @@ public class UserController {
 			@ApiImplicitParam(name = "answer", value = "忘记密码的答案", required = true, dataType = "String", paramType = "query")
 	})
 	public ServerResponse<String> forgetCheckAnswer(String username, String question, String answer) {
+		logger.info("校验忘记密码的问题答案, username: {}, question: {}, answer: {}", username, question, answer);
 		return userService.checkAnswer(username, question, answer);
 	}
 
@@ -151,6 +161,7 @@ public class UserController {
 			@ApiImplicitParam(name = "passwordNew", value = "新密码", required = true, dataType = "String", paramType = "query")
 	})
 	public ServerResponse<String> forgetResetPassword(String username, String forgetToken, String passwordNew) {
+		logger.info("忘记密码的重置密码, username: {}, forgetToken: {}, passwordNew: {}", username, forgetToken, passwordNew);
 		return userService.forgetResetPassword(username, forgetToken, passwordNew);
 	}
 
@@ -169,6 +180,7 @@ public class UserController {
 			@ApiImplicitParam(name = "passwordNew", value = "新密码", required = true, dataType = "String", paramType = "query")
 	})
 	public ServerResponse<String> resetPassword(HttpSession session, String passwordOld, String passwordNew) {
+		logger.info("登录状态下的重置密码, passwordOld: {}, passwordNew: {}", passwordOld, passwordNew);
 		User user = (User) session.getAttribute(Constant.CURRENT_USER);
 		if (user == null) {
 			return ServerResponse.createByErrorMessage("用户未登录!");
@@ -187,6 +199,7 @@ public class UserController {
 	@PutMapping("/update_user_info.do")
 	@ApiOperation(value = "更新当前登录的用户信息")
 	public ServerResponse<User> updateUserInfo(HttpSession session, User user) {
+		logger.info("更新当前登录的用户信息, user: {}", user);
 		User currentUser = (User) session.getAttribute(Constant.CURRENT_USER);
 		if (currentUser == null) {
 			return ServerResponse.createByErrorMessage("用户未登录!");
@@ -213,6 +226,7 @@ public class UserController {
 	@GetMapping("/get_user_detail_info.do")
 	@ApiOperation(value = "获取当前登录用户的详细信息")
 	public ServerResponse<User> getUserDetail(HttpSession session) {
+		logger.info("获取当前登录用户的详细信息");
 		User user = (User) session.getAttribute(Constant.CURRENT_USER);
 		if (user == null) {
 			return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户需要先登录！");

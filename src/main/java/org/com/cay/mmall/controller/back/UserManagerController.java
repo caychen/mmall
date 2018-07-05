@@ -8,6 +8,8 @@ import org.com.cay.mmall.common.Constant;
 import org.com.cay.mmall.common.ServerResponse;
 import org.com.cay.mmall.entity.User;
 import org.com.cay.mmall.service.IUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,8 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/manage/user")
 @Api("后台用户（管理员）模块控制类")
 public class UserManagerController {
+
+	private final Logger logger = LoggerFactory.getLogger(UserManagerController.class);
 
 	@Autowired
 	private IUserService userService;
@@ -41,6 +45,7 @@ public class UserManagerController {
 			@ApiImplicitParam(name = "password", value = "登录密码", required = true, dataType = "String", paramType = "query")
 	})
 	public ServerResponse<User> login(String username, String password, HttpSession session) {
+		logger.info("后台管理员登录, username: {}, password: {}", username, password);
 		ServerResponse<User> response = userService.login(username, password);
 		if (response.isSuccess()) {
 			User user = response.getData();
