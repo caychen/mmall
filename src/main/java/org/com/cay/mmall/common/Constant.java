@@ -42,4 +42,12 @@ public class Constant {
 			this.code = code;
 		}
 	}
+
+	public interface Cart{
+		int CHECKED = 1;
+		int UN_CHECKED = 2;
+
+		String LIMIT_NUM_FAIL = "LIMIT_NUM_FAIL";
+		String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS";
+	}
 }
