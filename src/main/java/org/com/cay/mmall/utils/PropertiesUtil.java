@@ -17,24 +17,26 @@ public class PropertiesUtil {
 
 	private static Properties props;
 
-	static{
-		String propertiesName = "mmall.properties";
+	static {
+		String[] propertiesNames = {"mmall.properties", "zfbinfo.properties"};
 		props = new Properties();
 		try {
-			props.load(new InputStreamReader(PropertiesUtil.class.getClassLoader().getResourceAsStream(propertiesName), "UTF-8"));
+			for (String propertiesName : propertiesNames) {
+				props.load(new InputStreamReader(PropertiesUtil.class.getClassLoader().getResourceAsStream(propertiesName), "UTF-8"));
+			}
 		} catch (IOException e) {
 			logger.error("配置文件读取异常: ", e);
 			e.printStackTrace();
 		}
 	}
 
-	public static String getProperty(String key){
+	public static String getProperty(String key) {
 		String value = props.getProperty(key.trim());
 
 		return StringUtils.isBlank(value) ? null : value.trim();
 	}
 
-	public static String getProperty(String key, String defaultValue){
+	public static String getProperty(String key, String defaultValue) {
 		String value = props.getProperty(key.trim());
 
 		return StringUtils.isBlank(value) ? defaultValue.trim() : value.trim();
