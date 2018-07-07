@@ -48,18 +48,18 @@ public class OrderController {
 	private IOrderService orderService;
 
 	/**
-	 * 提交订单，生成二维码
+	 * 预支付订单，生成二维码
 	 *
 	 * @param session
 	 * @param request
 	 * @param orderNo
 	 * @return
 	 */
-	@PostMapping("/create.do")
-	@ApiOperation(value = "提交订单，生成二维码")
+	@PostMapping("/prePay.do")
+	@ApiOperation(value = "预支付订单，生成二维码")
 	@ApiImplicitParam(name = "orderNo", value = "订单号", required = true, dataType = "Long", paramType = "query")
-	public ServerResponse create(HttpSession session, HttpServletRequest request, Long orderNo) {
-		logger.info("提交订单，生成二维码，orderNo: {}", orderNo);
+	public ServerResponse prePay(HttpSession session, HttpServletRequest request, Long orderNo) {
+		logger.info("预支付订单，生成二维码，orderNo: {}", orderNo);
 		User user = (User) session.getAttribute(Constant.CURRENT_USER);
 		if (user == null) {
 			return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
@@ -68,7 +68,7 @@ public class OrderController {
 		//用于返回二维码
 		String path = request.getSession().getServletContext().getRealPath("/upload");
 
-		ServerResponse response = orderService.pay(orderNo, user.getId(), path);
+		ServerResponse response = orderService.prePay(orderNo, user.getId(), path);
 		if (response.isSuccess()) {
 			//开启线程调用支付宝查询接口
 			startThreadForQueryOrder(orderNo);
@@ -85,7 +85,7 @@ public class OrderController {
 				Map responseMap = (Map) map.get("alipay_trade_query_response");
 				int code = Integer.parseInt(responseMap.get("code").toString());
 
-				if (code != Constant.PayCode.PAY_SUCCESS){
+				if (code != Constant.PayCode.PAY_SUCCESS) {
 					return;
 				}
 				String tradeStatus = (String) responseMap.get("trade_status");
@@ -196,8 +196,24 @@ public class OrderController {
 		return ServerResponse.createBySuccess(false);
 	}
 
-	@GetMapping("/test.do")
-	public String test() {
-		return "test";
+	/**
+	 * 创建订单
+	 *
+	 * @param session
+	 * @param shippingId
+	 * @return
+	 */
+	@PostMapping("/create.do")
+	@ApiOperation(value = "创建订单")
+	@ApiImplicitParam(name = "shippingId", value = "发货地址的id", required = true, dataType = "int", paramType = "query")
+	public ServerResponse create(HttpSession session, Integer shippingId){
+		logger.info("创建订单, shippingId: {}", shippingId);
+
+		User user = (User) session.getAttribute(Constant.CURRENT_USER);
+		if (user == null) {
+			return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+		}
+
+		return orderService.createOrder(user.getId(), shippingId);
 	}
 }

@@ -76,7 +76,7 @@ public class Constant {
 		}
 	}
 
-	public interface AlipayCallback{
+	public interface AlipayCallback {
 		String TRADE_STATUS_WAIT_BUYER_PAY = "WAIT_BUYER_PAY";
 		String TRADE_STATUS_TRADE_SUCCESS = "TRADE_SUCCESS";
 		String TRADE_STATUS_TRADE_CLOSED = "TRADE_CLOSED";
@@ -86,7 +86,7 @@ public class Constant {
 		String RESPONSE_FAILED = "failed";
 	}
 
-	public enum PayPlatformEnum{
+	public enum PayPlatformEnum {
 		ALIPAY(1, "支付宝"),
 		WECHATPAY(2, "微信");
 
@@ -107,7 +107,27 @@ public class Constant {
 		}
 	}
 
-	public interface PayCode{
+	public interface PayCode {
 		int PAY_SUCCESS = 10000;
+	}
+
+	public enum PaymentTypeEnum {
+		ONLINE_PAY(1, "在线支付");
+
+		private String value;
+		private int code;
+
+		PaymentTypeEnum(int code, String value) {
+			this.value = value;
+			this.code = code;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
+		public int getCode() {
+			return code;
+		}
 	}
 }

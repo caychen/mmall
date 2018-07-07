@@ -167,4 +167,27 @@
     where order_no = #{orderNo}
     and user_id = #{userId}
   </select>
+  
+  <insert id="batchInsert">
+    insert into mmall_order_item (id, user_id, order_no,
+      product_id, product_name, product_image,
+      current_unit_price, quantity, total_price,
+      create_time, update_time)
+    values
+    <foreach collection="orderItemList" item="orderItem" separator=",">
+    (
+      #{orderItem.id,jdbcType=INTEGER},
+      #{orderItem.userId,jdbcType=INTEGER},
+      #{orderItem.orderNo,jdbcType=BIGINT},
+      #{orderItem.productId,jdbcType=INTEGER},
+      #{orderItem.productName,jdbcType=VARCHAR},
+      #{orderItem.productImage,jdbcType=VARCHAR},
+      #{orderItem.currentUnitPrice,jdbcType=DECIMAL},
+      #{orderItem.quantity,jdbcType=INTEGER},
+      #{orderItem.totalPrice,jdbcType=DECIMAL},
+      now(),
+      now()
+    )
+    </foreach>
+  </insert>
 </mapper>

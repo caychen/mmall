@@ -15,12 +15,8 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang.StringUtils;
 import org.com.cay.mmall.common.Constant;
 import org.com.cay.mmall.common.ServerResponse;
-import org.com.cay.mmall.dao.OrderItemMapper;
-import org.com.cay.mmall.dao.OrderMapper;
-import org.com.cay.mmall.dao.PayInfoMapper;
-import org.com.cay.mmall.entity.Order;
-import org.com.cay.mmall.entity.OrderItem;
-import org.com.cay.mmall.entity.PayInfo;
+import org.com.cay.mmall.dao.*;
+import org.com.cay.mmall.entity.*;
 import org.com.cay.mmall.service.IOrderService;
 import org.com.cay.mmall.utils.BigDecimalUtil;
 import org.com.cay.mmall.utils.DateTimeUtil;
@@ -30,11 +26,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by Caychen on 2018/7/6.
@@ -53,8 +52,14 @@ public class OrderServiceImpl implements IOrderService {
 	@Autowired
 	private PayInfoMapper payInfoMapper;
 
+	@Autowired
+	private CartMapper cartMapper;
+
+	@Autowired
+	private ProductMapper productMapper;
+
 	@Override
-	public ServerResponse pay(Long orderNo, Integer userId, String path) {
+	public ServerResponse prePay(Long orderNo, Integer userId, String path) {
 		Map<String, String> resultMap = Maps.newHashMap();
 
 		Order order = orderMapper.selectByUserIdAndOrderNo(userId, orderNo);
@@ -238,10 +243,107 @@ public class OrderServiceImpl implements IOrderService {
 	@Override
 	public ServerResponse updateStatusByOrderNo(Long orderNo, int statusCode) {
 		int count = orderMapper.updateStatusByOrderNo(orderNo, statusCode);
-		if(count > 0){
+		if (count > 0) {
 			return ServerResponse.createBySuccess();
 		}
 		return ServerResponse.createByError();
+	}
+
+	@Override
+	public ServerResponse createOrder(Integer userId, Integer shippingId) {
+		//从购物车中获取已勾选的cart数据
+		List<Cart> cartList = cartMapper.selectCheckedCartByUserId(userId);
+
+		//计算订单总价
+		ServerResponse orderItemListResponse = getCartOrderItem(userId, cartList);
+		if (!orderItemListResponse.isSuccess()) {
+			return orderItemListResponse;
+		}
+
+		List<OrderItem> orderItemList = (List<OrderItem>) orderItemListResponse.getData();
+
+		if(CollectionUtils.isEmpty(orderItemList)){
+			return ServerResponse.createByErrorMessage("购物车为空！");
+		}
+
+		//获取订单总金额
+		BigDecimal payment = getOrderTotalPrice(orderItemList);
+
+		//生成订单
+		Order order = assembleOrder(userId, shippingId, payment);
+		if (order == null){
+			return ServerResponse.createByErrorMessage("生成订单失败！");
+		}
+
+		orderItemList.stream().forEach(orderItem -> orderItem.setOrderNo(order.getOrderNo()));
+
+		//批量插入orderItem
+		orderItemMapper.batchInsert(orderItemList);
+
+		//生成成功, 减少商品库存
+		reductProductStock(orderItemList);
+
+		//清空购物车
+		cleanCart(cartList);
+		return null;
+	}
+
+	private void cleanCart(List<Cart> cartList) {
+		cartList.stream().forEach(cart -> {
+			cartMapper.deleteByPrimaryKey(cart.getId());
+		});
+	}
+
+	/**
+	 * 减少商品库存
+	 *
+	 * @param orderItemList
+	 */
+	private void reductProductStock(List<OrderItem> orderItemList) {
+		orderItemList.stream().forEach(orderItem -> {
+			Product product = productMapper.selectByPrimaryKey(orderItem.getProductId());
+
+			product.setStock(product.getStock() - orderItem.getQuantity());
+			productMapper.updateByPrimaryKeySelective(product);
+		});
+	}
+
+	private Order assembleOrder(Integer userId, Integer shippingId, BigDecimal payment) {
+		Long orderNo = generatorOrderNo();
+		Order order = new Order();
+
+		order.setOrderNo(orderNo);
+		order.setStatus(Constant.StatusEnum.NO_PAY.getCode());
+		order.setPaymentType(Constant.PaymentTypeEnum.ONLINE_PAY.getCode());
+		order.setPostage(0);//暂时设置为全包邮
+		order.setPayment(payment);
+		order.setUserId(userId);
+		order.setShippingId(shippingId);
+
+		int count = orderMapper.insert(order);
+		if (count > 0) {
+			return order;
+		}
+		return null;
+	}
+
+	/**
+	 * 订单号生成(时间戳 + 随机数)
+	 *
+	 * @return
+	 */
+	private Long generatorOrderNo() {
+		long currentTime = System.currentTimeMillis();
+		return currentTime + new Random().nextInt(100);
+	}
+
+	private BigDecimal getOrderTotalPrice(List<OrderItem> orderItemList) {
+		BigDecimal payment = new BigDecimal("0");
+		for (OrderItem orderItem : orderItemList) {
+			payment = BigDecimalUtil.add(payment.doubleValue(), orderItem.getTotalPrice().doubleValue());
+		}
+
+		return payment;
 	}
 
 	// 简单打印应答
@@ -254,5 +356,45 @@ public class OrderServiceImpl implements IOrderService {
 			}
 			logger.info("body:" + response.getBody());
 		}
+	}
+
+	/**
+	 * 获取订单明细
+	 *
+	 * @param userId
+	 * @param cartList
+	 * @return
+	 */
+	private ServerResponse getCartOrderItem(Integer userId, List<Cart> cartList) {
+		List<OrderItem> orderItemList = Lists.newArrayList();
+
+		if (CollectionUtils.isEmpty(orderItemList)) {
+			return ServerResponse.createByErrorMessage("购物车为空！");
+		}
+
+		for (Cart cart : cartList) {
+			OrderItem orderItem = new OrderItem();
+
+			Product product = productMapper.selectByPrimaryKey(cart.getProductId());
+			if (product.getStatus() != Constant.ProductStatusEnum.ON_SALE.getCode()) {
+				return ServerResponse.createByErrorMessage("商品" + product.getName() + "不是在线售卖状态！");
+			}
+
+			//校验库存
+			if (cart.getQuantity() > product.getStock()) {
+				return ServerResponse.createByErrorMessage("商品" + product.getName() + "库存不足！");
+			}
+
+			orderItem.setUserId(userId);
+			orderItem.setProductId(product.getId());
+			orderItem.setProductName(product.getName());
+			orderItem.setProductImage(product.getMainImage());
+			orderItem.setCurrentUnitPrice(product.getPrice());
+			orderItem.setQuantity(cart.getQuantity());
+			orderItem.setTotalPrice(BigDecimalUtil.mul(product.getPrice().doubleValue(), cart.getQuantity()));
+			orderItemList.add(orderItem);
+		}
+
+		return ServerResponse.createBySuccess(orderItemList);
 	}
 }
