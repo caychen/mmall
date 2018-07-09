@@ -3,6 +3,7 @@ package org.com.cay.mmall.vo;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Created by Caychen on 2018/7/7.
@@ -34,4 +35,11 @@ public class OrderVo {
 
 	private String createTime;
 
+	List<OrderItemVo> orderItemVoList;
+
+	private String imageHost;
+	private Integer shippingId;
+	private String receiverName;
+
+	private ShippingVo shippingVo;
 }

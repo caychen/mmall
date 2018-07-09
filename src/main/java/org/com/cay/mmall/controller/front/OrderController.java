@@ -1,8 +1,6 @@
 package org.com.cay.mmall.controller.front;
 
 import com.alipay.api.AlipayApiException;
-import com.alipay.api.AlipayClient;
-import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.demo.trade.config.Configs;
@@ -10,6 +8,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.com.cay.mmall.common.Constant;
 import org.com.cay.mmall.common.ResponseCode;
@@ -21,10 +20,7 @@ import org.com.cay.mmall.utils.TaskUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -206,7 +202,7 @@ public class OrderController {
 	@PostMapping("/create.do")
 	@ApiOperation(value = "创建订单")
 	@ApiImplicitParam(name = "shippingId", value = "发货地址的id", required = true, dataType = "int", paramType = "query")
-	public ServerResponse create(HttpSession session, Integer shippingId){
+	public ServerResponse create(HttpSession session, Integer shippingId) {
 		logger.info("创建订单, shippingId: {}", shippingId);
 
 		User user = (User) session.getAttribute(Constant.CURRENT_USER);
@@ -215,5 +211,88 @@ public class OrderController {
 		}
 
 		return orderService.createOrder(user.getId(), shippingId);
+	}
+
+	/**
+	 * 取消订单
+	 *
+	 * @param session
+	 * @param orderNo
+	 * @return
+	 */
+	@DeleteMapping("/cancel.do")
+	@ApiOperation(value = "取消订单")
+	@ApiImplicitParam(name = "orderNo", value = "订单编号", required = true, dataType = "Long", paramType = "query")
+	public ServerResponse cancel(HttpSession session, Long orderNo) {
+		logger.info("取消订单, orderNo: {}", orderNo);
+
+		User user = (User) session.getAttribute(Constant.CURRENT_USER);
+		if (user == null) {
+			return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+		}
+
+		return orderService.cancelOrder(user.getId(), orderNo);
+	}
+
+	/**
+	 * 从购物车中获取商品信息
+	 *
+	 * @param session
+	 * @return
+	 */
+	@GetMapping("get_order_cart_product.do")
+	@ResponseBody
+	public ServerResponse getOrderCartProduct(HttpSession session) {
+		logger.info("从购物车中获取商品信息");
+		User user = (User) session.getAttribute(Constant.CURRENT_USER);
+		if (user == null) {
+			return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+		}
+		return orderService.getOrderCartProduct(user.getId());
+	}
+
+	/**
+	 * 获取订单详情
+	 *
+	 * @param session
+	 * @return
+	 */
+	@GetMapping("/order_detail.do")
+	@ApiOperation(value = "获取订单详情")
+	@ApiImplicitParam(name = "orderNo", value = "订单号", required = true, dataType = "Long", paramType = "query")
+	public ServerResponse getOrderDetail(HttpSession session, Long orderNo) {
+		logger.info("获取订单详情, orderNo: {}", orderNo);
+
+		User user = (User) session.getAttribute(Constant.CURRENT_USER);
+		if (user == null) {
+			return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+		}
+
+		return orderService.getOrderDetail(user.getId(), orderNo);
+	}
+
+	/**
+	 * 获取商品列表
+	 *
+	 * @param session
+	 * @return
+	 */
+	@GetMapping("/list.do")
+	@ApiOperation(value = "获取商品列表")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "pageNum", value = "页码", dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "pageSize", value = "每页记录数", dataType = "int", paramType = "query"),
+	})
+	public ServerResponse list(HttpSession session,
+	                           @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum,
+	                           @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize) {
+		logger.info("获取商品列表, pageNum: {}, pageSize: {}", pageNum, pageSize);
+
+		User user = (User) session.getAttribute(Constant.CURRENT_USER);
+		if (user == null) {
+			return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), ResponseCode.NEED_LOGIN.getDesc());
+		}
+
+		return orderService.getOrderList(user.getId(), pageNum, pageSize);
 	}
 }

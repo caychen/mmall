@@ -74,6 +74,15 @@ public class Constant {
 		public int getCode() {
 			return code;
 		}
+
+		public static StatusEnum codeOf(int code) {
+			for (StatusEnum e : StatusEnum.values()) {
+				if (e.getCode() == code) {
+					return e;
+				}
+			}
+			throw new RuntimeException("没有找到对应的枚举");
+		}
 	}
 
 	public interface AlipayCallback {
@@ -128,6 +137,15 @@ public class Constant {
 
 		public int getCode() {
 			return code;
+		}
+
+		public static PaymentTypeEnum codeOf(int code) {
+			for (PaymentTypeEnum e : PaymentTypeEnum.values()) {
+				if (e.getCode() == code) {
+					return e;
+				}
+			}
+			throw new RuntimeException("没有找到对应的枚举");
 		}
 	}
 }
